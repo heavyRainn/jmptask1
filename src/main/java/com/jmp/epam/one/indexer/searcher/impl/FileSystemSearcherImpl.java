@@ -1,6 +1,9 @@
 package com.jmp.epam.one.indexer.searcher.impl;
 
 import com.jmp.epam.one.indexer.searcher.FileSystemSearcher;
+import com.jmp.epam.one.ui.UserInterface;
+import com.jmp.epam.one.utils.IndexerUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -11,6 +14,9 @@ import java.util.stream.Collectors;
 @Component
 public class FileSystemSearcherImpl implements FileSystemSearcher {
 
+    @Value("${length.of.searching}")
+    private int length;
+
     @Override
     public Map<String, String> find(Map<String, String> indexes, String inputToSearch) {
         return indexes
@@ -20,6 +26,8 @@ public class FileSystemSearcherImpl implements FileSystemSearcher {
     }
 
     private boolean checkByRegexp(String inputToSearch, String key) {
+        inputToSearch = IndexerUtils.validate(inputToSearch, length);
+
         Pattern pattern = Pattern.compile(inputToSearch);
         Matcher matcher = pattern.matcher(key);
 

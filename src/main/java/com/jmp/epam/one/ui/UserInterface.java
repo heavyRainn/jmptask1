@@ -2,8 +2,8 @@ package com.jmp.epam.one.ui;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.System.out;
 
@@ -46,11 +46,14 @@ public class UserInterface {
     }
 
     public void printResult(Map<String, String> searchResults) {
-        out.println("Was/were founded : " + searchResults.toString());
+        for (Map.Entry<String, String> stringStringEntry : searchResults.entrySet()) {
+            out.println(stringStringEntry);
+        }
     }
 
     public void exit() {
         out.println("BYE BYE !!!");
+        System.exit(0);
     }
 
 }

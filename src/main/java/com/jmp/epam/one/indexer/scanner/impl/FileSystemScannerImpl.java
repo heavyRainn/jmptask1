@@ -1,6 +1,5 @@
 package com.jmp.epam.one.indexer.scanner.impl;
 
-import com.jmp.epam.one.indexer.scanner.FileSystemScanner;
 import com.jmp.epam.one.utils.IndexerUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +12,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 @Component
-public class FileSystemScannerImpl implements FileSystemScanner {
+public class FileSystemScannerImpl implements Callable<Map<String, String>> {
 
     private static final Logger logger = Logger.getLogger(FileSystemScannerImpl.class);
 
@@ -27,12 +27,13 @@ public class FileSystemScannerImpl implements FileSystemScanner {
     private int numberOfSlashesInPath;
 
     @Override
-    public Map<String, String> scan() {
+    public Map<String, String> call() throws Exception {
         Map<String, String> indexes = new HashMap<>();
         Path directory = Paths.get(directoryToScan);
         numberOfSlashesInPath = IndexerUtils.getNumberOfSlashes(directory.toString());
 
         scanDirectory(indexes, directory);
+
 
         return indexes;
     }

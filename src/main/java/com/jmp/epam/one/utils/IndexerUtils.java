@@ -17,4 +17,12 @@ public class IndexerUtils {
         return counter;
     }
 
+    public static String validate(String inputToSearch, int length) {
+        if(inputToSearch.length() > length){
+            inputToSearch = inputToSearch.substring(ZERO, length);
+        }
+
+        return inputToSearch;
+    }
+
 }

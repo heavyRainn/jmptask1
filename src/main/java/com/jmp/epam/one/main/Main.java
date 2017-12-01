@@ -20,7 +20,6 @@ public class Main {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         Thread indexer = ctx.getBean(Indexer.class);
 
-        indexer.setDaemon(true);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(indexer);
 
