@@ -56,4 +56,7 @@ public class UserInterface {
         System.exit(0);
     }
 
+    public void nothingFound() {
+        out.println("NOTHING WERE FOUND !!!");
+    }
 }

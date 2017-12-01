@@ -72,9 +72,13 @@ public class Indexer extends Thread {
 
         String inputToSearch = userInterface.getUserInputToSearch();
         Map<String, String> searchingResults = fileSystemSearcher.find(indexes, inputToSearch);
-        UserInterface.notifyAboutFinishingSearching();
 
-        userInterface.printResult(searchingResults);
+        if (searchingResults.size() != 0) {
+            UserInterface.notifyAboutFinishingSearching();
+            userInterface.printResult(searchingResults);
+        } else {
+            userInterface.nothingFound();
+        }
     }
 
 
