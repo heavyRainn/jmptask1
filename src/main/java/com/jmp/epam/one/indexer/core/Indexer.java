@@ -81,11 +81,7 @@ public class Indexer extends Thread {
     private Map<String, String> scan() {
         userInterface.scan();
 
-        Map<String, String> indexes;
-
-        synchronized (this) {
-            indexes = executeCallable();
-        }
+        Map<String, String> indexes = executeCallable();
 
         fileSystemWriter.write(indexationFilename, indexes.toString());
         UserInterface.notifyAboutFinishingScanning();
