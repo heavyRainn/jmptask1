@@ -1,6 +1,8 @@
 package com.jmp.epam.one.indexer.scanner.impl;
 
 import com.jmp.epam.one.indexer.scanner.FileSystemScanner;
+import com.jmp.epam.one.utils.IndexerUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +14,10 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 @Component
 public class FileSystemScannerImpl implements FileSystemScanner {
 
     private static final Logger logger = Logger.getLogger(FileSystemScannerImpl.class);
-    private static final Character SLASH = '\\';
 
     @Value("${directory.to.scan}")
     private String directoryToScan;
@@ -31,7 +30,7 @@ public class FileSystemScannerImpl implements FileSystemScanner {
     public Map<String, String> scan() {
         Map<String, String> indexes = new HashMap<>();
         Path directory = Paths.get(directoryToScan);
-        numberOfSlashesInPath = getNumberOfSlashes(directory.toString());
+        numberOfSlashesInPath = IndexerUtils.getNumberOfSlashes(directory.toString());
 
         scanDirectory(indexes, directory);
 
@@ -56,22 +55,7 @@ public class FileSystemScannerImpl implements FileSystemScanner {
     }
 
     private boolean isDeeperThanNestingLevel(String scanningDirectory) {
-        return getNumberOfSlashes(scanningDirectory) - numberOfSlashesInPath < nestingLevel;
+        return IndexerUtils.getNumberOfSlashes(scanningDirectory) - numberOfSlashesInPath < nestingLevel;
     }
-
-
-
-    private int getNumberOfSlashes(String s) {
-        int counter = 0;
-
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == SLASH) {
-                counter++;
-            }
-        }
-
-        return counter;
-    }
-
 
 }
