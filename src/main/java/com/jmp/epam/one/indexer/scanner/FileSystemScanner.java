@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface FileSystemScanner {
 
-    Map<String, String> scan(String scanPath, int nestingLevel);
+    Map<String, String> scan();
 
 }

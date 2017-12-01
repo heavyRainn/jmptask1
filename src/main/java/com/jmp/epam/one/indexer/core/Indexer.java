@@ -12,17 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class Indexer extends Thread{
+public class Indexer extends Thread {
 
-    private static final String SCAN ="scan";
+    private static final String SCAN = "scan";
     private static final String SEARCH = "search";
     private static final String EXIT = "exit";
-
-    @Value("${directory.to.scan}")
-    private String directoryToScan;
-
-    @Value("${nesting.level}")
-    private int nestingLevel;
 
     @Value("${indexation.file.name}")
     private String indexationFilename;
@@ -49,7 +43,7 @@ public class Indexer extends Thread{
 
         while (isWorking) switch (userChoice) {
             case SCAN:
-                indexes = scan(indexes, directoryToScan, nestingLevel);
+                indexes = scan();
                 userChoice = userInterface.waitingForUserEnter();
                 break;
             case SEARCH:
@@ -78,10 +72,10 @@ public class Indexer extends Thread{
     }
 
 
-    private Map<String, String> scan(Map<String, String> indexes, String directoryToScan, int nestingLevel) {
+    private Map<String, String> scan() {
         userInterface.scan();
 
-        indexes = fileSystemScanner.scan(directoryToScan, nestingLevel);
+        Map<String, String> indexes = fileSystemScanner.scan();
         fileSystemWriter.write(indexationFilename, indexes.toString());
         UserInterface.notifyAboutFinishingScanning();
 
