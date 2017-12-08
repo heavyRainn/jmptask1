@@ -53,7 +53,6 @@ public class UserInterface {
 
     public void exit() {
         out.println("BYE BYE !!!");
-        System.exit(0);
     }
 
     public void nothingFound() {

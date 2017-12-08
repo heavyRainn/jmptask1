@@ -26,9 +26,9 @@ public class FileSystemSearcherImpl implements FileSystemSearcher {
     }
 
     private boolean checkByRegexp(String inputToSearch, String key) {
-        inputToSearch = IndexerUtils.validate(inputToSearch, length);
+        String validatedInputToSearch = IndexerUtils.validate(inputToSearch, length);
 
-        Pattern pattern = Pattern.compile(inputToSearch);
+        Pattern pattern = Pattern.compile(validatedInputToSearch);
         Matcher matcher = pattern.matcher(key);
 
         return matcher.find();

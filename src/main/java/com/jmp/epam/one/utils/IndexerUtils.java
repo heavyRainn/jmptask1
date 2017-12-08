@@ -18,11 +18,13 @@ public class IndexerUtils {
     }
 
     public static String validate(String inputToSearch, int length) {
+        String input = inputToSearch;
+
         if(inputToSearch.length() > length){
-            inputToSearch = inputToSearch.substring(ZERO, length);
+            input = inputToSearch.substring(ZERO, length);
         }
 
-        return inputToSearch;
+        return input;
     }
 
 }

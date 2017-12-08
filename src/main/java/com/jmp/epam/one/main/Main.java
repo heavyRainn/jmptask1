@@ -16,15 +16,15 @@ public class Main {
 
     private static final String FILENAME = "indexation.txt";
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException, IOException {
+    public static void main(String[] args) throws  IOException {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         Thread indexer = ctx.getBean(Indexer.class);
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(indexer);
 
-        String content = new String(Files.readAllBytes(Paths.get(FILENAME)));
-        System.out.println(content);
+//        String content = new String(Files.readAllBytes(Paths.get(FILENAME)));
+//        System.out.println(content);
     }
 
 }

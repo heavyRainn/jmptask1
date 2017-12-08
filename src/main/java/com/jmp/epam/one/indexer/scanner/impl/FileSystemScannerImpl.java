@@ -2,6 +2,7 @@ package com.jmp.epam.one.indexer.scanner.impl;
 
 import com.jmp.epam.one.utils.IndexerUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 @Component
-public class FileSystemScannerImpl implements Callable<Map<String, String>> {
+public class FileSystemScannerImpl extends Thread {
 
     private static final Logger logger = Logger.getLogger(FileSystemScannerImpl.class);
 
@@ -26,19 +26,18 @@ public class FileSystemScannerImpl implements Callable<Map<String, String>> {
     private int nestingLevel;
     private int numberOfSlashesInPath;
 
+    @Autowired
+    private Map<String, String> indexes;
+
     @Override
-    public Map<String, String> call() throws Exception {
-        Map<String, String> indexes = new HashMap<>();
+    public void run() {
         Path directory = Paths.get(directoryToScan);
         numberOfSlashesInPath = IndexerUtils.getNumberOfSlashes(directory.toString());
 
         scanDirectory(indexes, directory);
-
-
-        return indexes;
     }
 
-    private void scanDirectory(Map<String, String> indexes, Path directory) {
+    private synchronized void scanDirectory(Map<String, String> indexes, Path directory) {
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
 
             for (Path child : directoryStream) {
@@ -49,7 +48,6 @@ public class FileSystemScannerImpl implements Callable<Map<String, String>> {
                     logger.info(child.toString());
                 }
             }
-
         } catch (IOException e) {
             logger.error(e);
         }

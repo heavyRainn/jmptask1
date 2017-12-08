@@ -1,5 +1,6 @@
 package com.jmp.epam.one.indexer.core;
 
+import com.jmp.epam.one.indexer.scanner.impl.FileSystemScannerImpl;
 import com.jmp.epam.one.indexer.searcher.FileSystemSearcher;
 import com.jmp.epam.one.indexer.writer.FileSystemWriter;
 import com.jmp.epam.one.ui.UserInterface;
@@ -8,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 @Component
 public class Indexer extends Thread {
@@ -28,9 +27,6 @@ public class Indexer extends Thread {
     private Long timeout;
 
     @Autowired
-    private Callable<Map<String, String>> fileSystemScanner;
-
-    @Autowired
     private FileSystemWriter fileSystemWriter;
 
     @Autowired
@@ -39,9 +35,14 @@ public class Indexer extends Thread {
     @Autowired
     private UserInterface userInterface;
 
+    @Autowired
+    private Map<String, String> indexes;
+
+    @Autowired
+    private FileSystemScannerImpl fileSystemScanner;
+
     @Override
     public void run() {
-        Map<String, String> indexes = new HashMap<>();
 
         boolean isWorking = true;
         userInterface.greet();
@@ -49,7 +50,7 @@ public class Indexer extends Thread {
 
         while (isWorking) switch (userChoice) {
             case SCAN:
-                indexes = scan();
+                scan();
                 userChoice = userInterface.waitingForUserEnter();
                 break;
             case SEARCH:
@@ -82,30 +83,27 @@ public class Indexer extends Thread {
     }
 
 
-    private Map<String, String> scan() {
+    private void scan() {
         userInterface.scan();
 
-        Map<String, String> indexes = executeCallable();
+        executeScan();
 
         fileSystemWriter.write(indexationFilename, indexes.toString());
         UserInterface.notifyAboutFinishingScanning();
 
         userInterface.printResult(indexes);
-        return indexes;
     }
 
-    private Map<String,String> executeCallable() {
-        Map<String, String> indexes = null;
+    private synchronized void executeScan() {
+        fileSystemScanner.setDaemon(true);
 
         try {
-            //((Thread)fileSystemScanner).setDaemon(true); TODO we should make setDaemon(true)
-            indexes = fileSystemScanner.call();
-            fileSystemScanner.wait(timeout);
+            fileSystemScanner.start();
         } catch (Exception e) {
             logger.error(e);
         }
 
-        return indexes;
+
     }
 
 }
