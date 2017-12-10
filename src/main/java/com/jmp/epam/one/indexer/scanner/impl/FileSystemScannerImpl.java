@@ -11,8 +11,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class FileSystemScannerImpl extends Thread {
@@ -22,11 +24,12 @@ public class FileSystemScannerImpl extends Thread {
     @Value("${directory.to.scan}")
     private String directoryToScan;
 
+    @Value("${timeout.of.daemon}")
+    private Long timeout;
+
     @Value("${nesting.level}")
     private int nestingLevel;
     private int numberOfSlashesInPath;
-
-    @Autowired
     private Map<String, String> indexes;
 
     @Override
@@ -35,6 +38,14 @@ public class FileSystemScannerImpl extends Thread {
         numberOfSlashesInPath = IndexerUtils.getNumberOfSlashes(directory.toString());
 
         scanDirectory(indexes, directory);
+        synchronized (this) {
+            try {
+                this.wait(timeout);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
+        }
+
     }
 
     private synchronized void scanDirectory(Map<String, String> indexes, Path directory) {
@@ -48,13 +59,19 @@ public class FileSystemScannerImpl extends Thread {
                     logger.info(child.toString());
                 }
             }
+
         } catch (IOException e) {
             logger.error(e);
         }
+        this.notify();
     }
 
     private boolean isDeeperThanNestingLevel(String scanningDirectory) {
         return IndexerUtils.getNumberOfSlashes(scanningDirectory) - numberOfSlashesInPath < nestingLevel;
+    }
+
+    public void setIndexes(Map<String, String> indexes) {
+        this.indexes = indexes;
     }
 
 }

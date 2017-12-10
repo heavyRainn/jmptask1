@@ -2,8 +2,8 @@ package com.jmp.epam.one.ui;
 
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Scanner;
 
 import static java.lang.System.out;
 
@@ -20,7 +20,15 @@ public class UserInterface {
         out.println("-------------------------------------------------------------------------------------------------------------------/");
         out.print("Please enter your choice : ");
 
-        return scanner.next().toLowerCase();
+        return scanner.next().toUpperCase();
+    }
+
+    public String invalidUserInput(){
+        out.println("-------------------------------------------------------------------------------------------------------------------/");
+        out.print("YOU HAVE ENTERED INVALID ACTION !!!");
+        out.print("Please enter valid action : ");
+
+        return scanner.next().toUpperCase();
     }
 
     public String getUserInputToSearch() {
@@ -57,5 +65,9 @@ public class UserInterface {
 
     public void nothingFound() {
         out.println("NOTHING WERE FOUND !!!");
+    }
+
+    public void invalidSearch() {
+        out.println("NO DATA TO SEARCH, FIRSTLY SEARCHING YOU SHOULD SCAN !!!");
     }
 }
