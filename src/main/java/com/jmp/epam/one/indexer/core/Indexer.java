@@ -2,9 +2,9 @@ package com.jmp.epam.one.indexer.core;
 
 import com.jmp.epam.one.indexer.scanner.impl.FileSystemScannerImpl;
 import com.jmp.epam.one.indexer.searcher.FileSystemSearcher;
-import com.jmp.epam.one.indexer.writer.FileSystemWriter;
-import com.jmp.epam.one.ui.UserInterface;
-import org.apache.log4j.Logger;
+import com.jmp.epam.one.indexer.writer.FileSystemWorker;
+import com.jmp.epam.one.utils.IndexerUtils;
+import com.jmp.epam.one.utils.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,19 +15,14 @@ import java.util.Map;
 @Component
 public class Indexer extends Thread {
 
-    private static final Logger logger = Logger.getLogger(Indexer.class);
-
     @Value("${indexation.file.name}")
     private String indexationFilename;
 
     @Autowired
-    private FileSystemWriter fileSystemWriter;
+    private FileSystemWorker fileSystemWorker;
 
     @Autowired
     private FileSystemSearcher fileSystemSearcher;
-
-    @Autowired
-    private UserInterface userInterface;
 
     @Autowired
     private FileSystemScannerImpl fileSystemScanner;
@@ -36,66 +31,68 @@ public class Indexer extends Thread {
     @Override
     public void run() {
 
-        boolean isWorking = true;
-        userInterface.greet();
-        String userChoice = userInterface.waitingForUserEnter();
+        boolean isWorking = Boolean.TRUE;
+        UserInterface.greet();
+        String userChoice = UserInterface.waitingForUserEnter();
 
         while (isWorking) switch (Action.convertFromString(userChoice)) {
             case SCAN:
                 scan();
-                userChoice = userInterface.waitingForUserEnter();
+                userChoice = UserInterface.waitingForUserEnter();
                 break;
             case SEARCH:
-                if (indexes.isEmpty()) {
-                    userInterface.invalidSearch();
-                } else {
-                    search(indexes);
-                }
-
-                userChoice = userInterface.waitingForUserEnter();
+                search(indexes);
+                userChoice = UserInterface.waitingForUserEnter();
+                break;
+            case SHOW_CACHE:
+                indexes = fileSystemWorker.read();
+                UserInterface.printResult(indexes);
+                userChoice = UserInterface.waitingForUserEnter();
                 break;
             case EXIT:
-                userInterface.exit();
-                Runtime.getRuntime().halt(0);
-                isWorking = false;
+                UserInterface.exit();
+                Runtime.getRuntime().halt(IndexerUtils.ZERO);
+                isWorking = Boolean.FALSE;
                 break;
-            default:
-                userChoice = userInterface.invalidUserInput();
+            case DEFAULT:
+                userChoice = UserInterface.invalidUserInput();
         }
 
     }
 
     private void search(Map<String, String> indexes) {
-        userInterface.search();
+        if (indexes.isEmpty()) {
+            UserInterface.invalidSearch();
+            return;
+        }
 
-        String inputToSearch = userInterface.getUserInputToSearch();
+        UserInterface.search();
+        String inputToSearch = UserInterface.getUserInputToSearch();
+
         Map<String, String> searchingResults = fileSystemSearcher.find(indexes, inputToSearch);
 
         if (searchingResults.size() != 0) {
             UserInterface.notifyAboutFinishingSearching();
-            userInterface.printResult(searchingResults);
+            UserInterface.printResult(searchingResults);
         } else {
-            userInterface.nothingFound();
+            UserInterface.nothingFound();
         }
     }
 
-
     private void scan() {
-        userInterface.scan();
+        UserInterface.scan();
 
         executeScan();
+        fileSystemWorker.write(indexationFilename, indexes);
 
-        fileSystemWriter.write(indexationFilename, indexes.toString());
         UserInterface.notifyAboutFinishingScanning();
-
-        userInterface.printResult(indexes);
+        UserInterface.printResult(indexes);
     }
 
     private void executeScan() {
-        fileSystemScanner.setDaemon(true);
+        fileSystemScanner.setDaemon(Boolean.TRUE);
         fileSystemScanner.setIndexes(indexes);
         fileSystemScanner.run();
     }
-
 
 }

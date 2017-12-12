@@ -16,7 +16,7 @@ public class Main {
 
     private static final String FILENAME = "indexation.txt";
 
-    public static void main(String[] args) throws  IOException {
+    public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         Thread indexer = ctx.getBean(Indexer.class);
 

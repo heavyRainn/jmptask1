@@ -5,6 +5,7 @@ public enum Action {
     SCAN,
     SEARCH,
     EXIT,
+    SHOW_CACHE,
     DEFAULT;
 
     public static Action convertFromString(String action) {

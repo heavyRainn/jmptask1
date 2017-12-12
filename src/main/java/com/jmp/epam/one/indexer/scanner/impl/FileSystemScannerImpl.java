@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -29,15 +30,15 @@ public class FileSystemScannerImpl extends Thread {
 
     @Value("${nesting.level}")
     private int nestingLevel;
-    private int numberOfSlashesInPath;
-    private Map<String, String> indexes;
+    private Map<String, String> indexes = new HashMap<>();
 
     @Override
     public void run() {
-        Path directory = Paths.get(directoryToScan);
-        numberOfSlashesInPath = IndexerUtils.getNumberOfSlashes(directory.toString());
+        if(StringUtils.isEmpty(directoryToScan)){
+            return;
+        }
 
-        scanDirectory(indexes, directory);
+        scanDirectory(indexes, directoryToScan);
         synchronized (this) {
             try {
                 this.wait(timeout);
@@ -48,26 +49,19 @@ public class FileSystemScannerImpl extends Thread {
 
     }
 
-    private synchronized void scanDirectory(Map<String, String> indexes, Path directory) {
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
-
-            for (Path child : directoryStream) {
-                if (child.toFile().isDirectory() && isDeeperThanNestingLevel(child.toString())) {
-                    scanDirectory(indexes, child);
-                } else {
-                    indexes.put(child.getFileName().toString(), child.toString());
-                    logger.info(child.toString());
-                }
-            }
-
+    private synchronized void scanDirectory(Map<String, String> indexes, String directory) {
+        try {
+            Files.find(
+                    Paths.get(directory),
+                    nestingLevel,
+                    (path, basicFileAttributes) -> basicFileAttributes.isRegularFile()).forEach(
+                            path -> indexes.put(path.getFileName().toString(),
+                                                path.toString()
+                            )
+            );
         } catch (IOException e) {
             logger.error(e);
         }
-        this.notify();
-    }
-
-    private boolean isDeeperThanNestingLevel(String scanningDirectory) {
-        return IndexerUtils.getNumberOfSlashes(scanningDirectory) - numberOfSlashesInPath < nestingLevel;
     }
 
     public void setIndexes(Map<String, String> indexes) {
