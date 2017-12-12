@@ -49,7 +49,7 @@ public class FileSystemScannerImpl extends Thread {
 
     }
 
-    private synchronized void scanDirectory(Map<String, String> indexes, String directory) {
+    private void scanDirectory(Map<String, String> indexes, String directory) {
         try {
             Files.find(
                     Paths.get(directory),

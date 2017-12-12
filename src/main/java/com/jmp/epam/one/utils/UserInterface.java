@@ -18,12 +18,6 @@ public class UserInterface {
         out.println("");
     }
 
-    public static String waitingForUserEnter() {
-        out.print("Please enter your choice : ");
-
-        return SCANNER.next().toUpperCase();
-    }
-
     public static String invalidUserInput(){
 
         out.println("-------------------------------------------------------------------------------------------------------------------/");
@@ -34,12 +28,6 @@ public class UserInterface {
         out.print("Please enter valid action : ");
 
         return SCANNER.next().toUpperCase();
-    }
-
-    public static String getUserInputToSearch() {
-        out.print("Please enter file name you want to find : ");
-
-        return SCANNER.next();
     }
 
     public static void scan() {
@@ -74,18 +62,30 @@ public class UserInterface {
         out.println("-------------------------------------------------------------------------------------------------------------------/");
     }
 
-    public static void printResult(Map<String, String> searchResults) {
-        for (Map.Entry<String, String> stringStringEntry : searchResults.entrySet()) {
-            out.println(stringStringEntry);
-        }
-    }
-
     public static void exit() {
         out.println("-------------------------------------------------------------------------------------------------------------------/");
         out.println("-------------------------------------------------------------------------------------------------------------------/");
         out.println("------------------------------------------- BYE BYE !!! -----------------------------------------------------------/");
         out.println("-------------------------------------------------------------------------------------------------------------------/");
         out.println("-------------------------------------------------------------------------------------------------------------------/");
+    }
+
+    public static void printResult(Map<String, String> searchResults) {
+        for (Map.Entry<String, String> stringStringEntry : searchResults.entrySet()) {
+            out.println(stringStringEntry);
+        }
+    }
+
+    public static String getUserInputToSearch() {
+        out.print("Please enter file name you want to find : ");
+
+        return SCANNER.next();
+    }
+
+    public static String waitingForUserEnter() {
+        out.print("Please enter your choice : ");
+
+        return SCANNER.next().toUpperCase();
     }
 
     public static void nothingFound() {

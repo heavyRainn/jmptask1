@@ -39,8 +39,7 @@ public class FileSystemWorkerImpl implements FileSystemWorker {
         Map<String, String> cachedIndexes = Collections.emptyMap();
 
         try {
-            cachedIndexes = objectMapper.readValue(new File(indexationFilename), new TypeReference<Map<String, String>>() {
-            });
+            cachedIndexes = objectMapper.readValue(new File(indexationFilename), new TypeReference<Map<String, String>>() {});
         } catch (IOException e) {
             logger.error(e);
         }
