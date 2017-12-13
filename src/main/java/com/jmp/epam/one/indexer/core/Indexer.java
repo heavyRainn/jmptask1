@@ -7,13 +7,14 @@ import com.jmp.epam.one.utils.IndexerUtils;
 import com.jmp.epam.one.utils.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class Indexer extends Thread {
+public class Indexer implements Runnable {
 
     @Value("${indexation.file.name}")
     private String indexationFilename;
@@ -23,10 +24,10 @@ public class Indexer extends Thread {
 
     @Autowired
     private FileSystemSearcher fileSystemSearcher;
+    private volatile Map<String, String> indexes = new HashMap<>();
 
     @Autowired
-    private FileSystemScannerImpl fileSystemScanner;
-    private Map<String, String> indexes = new HashMap<>();
+    private AutowireCapableBeanFactory beanFactory;
 
     @Override
     public void run() {
@@ -90,9 +91,12 @@ public class Indexer extends Thread {
     }
 
     private void executeScan() {
+        FileSystemScannerImpl fileSystemScanner = new FileSystemScannerImpl();
+        beanFactory.autowireBean(fileSystemScanner);
+
         fileSystemScanner.setDaemon(Boolean.TRUE);
         fileSystemScanner.setIndexes(indexes);
-        fileSystemScanner.run();
+        fileSystemScanner.start();
     }
 
 }
